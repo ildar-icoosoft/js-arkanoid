@@ -33,7 +33,7 @@ export class Ball {
     this.x += this.xStep;
     this.y += this.yStep;
 
-    if ((this.x < 0) || (this.x > SPACE_WIDTH)) {
+    if ((this.x < 0) || (this.x + this.width > SPACE_WIDTH)) {
       this.bounceX();
     } else if (this.y < 0) {
       this.bounceY();
