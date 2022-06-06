@@ -43,8 +43,11 @@ export class Game {
 
     document.addEventListener('mousemove', (event) => {
       const relativeX = event.clientX - this.space.canvas.offsetLeft;
-      if(relativeX > 0 && relativeX < this.space.canvas.width) {
-        this.paddle.x = relativeX - PADDLE_WIDTH / 2;
+      this.paddle.x = relativeX - PADDLE_WIDTH / 2;
+      if (this.paddle.x < 0) {
+        this.paddle.x = 0;
+      } else if (this.paddle.x > this.space.canvas.width - PADDLE_WIDTH) {
+        this.paddle.x = this.space.canvas.width - PADDLE_WIDTH;
       }
     });
 
