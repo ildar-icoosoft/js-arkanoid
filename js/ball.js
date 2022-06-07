@@ -17,8 +17,6 @@ export class Ball {
   constructor() {
     this.image = new Image();
     this.image.src = 'images/ball.png';
-    this.width = BALL_WIDTH;
-    this.height = BALL_HEIGHT;
     this.reset();
   }
 
@@ -27,6 +25,8 @@ export class Ball {
     this.y = BALL_Y;
     this.xStep = BALL_SPEED;
     this.yStep = BALL_SPEED;
+    this.width = BALL_WIDTH;
+    this.height = BALL_HEIGHT;
   }
 
   update() {
@@ -64,8 +64,8 @@ export class Ball {
     return {
       lx: this.x,
       ly: this.y,
-      rx: this.x + BALL_WIDTH,
-      ry: this.y + BALL_HEIGHT
+      rx: this.x + this.width,
+      ry: this.y + this.height
     };
   }
 }
