@@ -21,8 +21,6 @@ const BRICKS_Y = 50;
  */
 export class Brick {
   constructor(id, x, y, energy) {
-    this.image = new Image();
-    this.image.src = `images/${id}.png`;
     this.initialX = x;
     this.initialY = y;
     this.initialEnergy = energy;
@@ -47,12 +45,10 @@ export class Brick {
 
   draw(context) {
     if (this.intact()) {
-      context.drawImage(
-        this.image,
-        this.x,
-        this.y,
-        BRICK_WIDTH,
-        BRICK_HEIGHT);
+      context.save();
+      context.fillStyle = '#09F';
+      context.fillRect(this.x, this.y, BRICK_WIDTH, BRICK_HEIGHT);
+      context.restore();
     }
   }
 
