@@ -116,7 +116,7 @@ export class Game {
 
     this.update();
 
-    if (this.paddle.y < this.ball.y) {
+    if (this.ball.y > this.space.canvas.height - this.ball.height) {
       this.gameOver = true;
     } else if (isColliding(this.paddle.box(), this.ball.box())) {
       this.ball.bounceY();
