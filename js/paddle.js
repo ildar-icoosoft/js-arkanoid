@@ -1,10 +1,10 @@
 'use strict';
 
-import { SPACE_WIDTH, SPACE_HEIGHT } from './space.js';
+import {SPACE_WIDTH, SPACE_HEIGHT} from './space.js';
 
-export const PADDLE_WIDTH = 150;
-export const PADDLE_HEIGHT = 25;
-const PADDLE_SPEED = 10;
+const PADDLE_WIDTH = 150;
+const PADDLE_HEIGHT = 25;
+const PADDLE_SPEED = 25;
 const PADDLE_BOTTOM = 100;
 const PADDLE_X = Math.floor((SPACE_WIDTH - PADDLE_WIDTH) / 2);
 const PADDLE_Y = SPACE_HEIGHT - PADDLE_BOTTOM;
@@ -26,39 +26,54 @@ export class Paddle {
   reset() {
     this.x = PADDLE_X;
     this.y = PADDLE_Y;
-    this.step = 0;
+    this.width = PADDLE_WIDTH;
+    this.height = PADDLE_HEIGHT;
+    this.targetX = null; // точка, в которую направляется лопатка. null если она неподвижна
   }
 
   leftDown() {
-    this.step = -PADDLE_SPEED;
+    this.targetX = -1;
   }
 
   rightDown() {
-    this.step = PADDLE_SPEED;
+    this.targetX = PADDLE_END;
   }
 
   leftUp() {
-    if (this.step === -PADDLE_SPEED) {
-      this.step = 0;
+    if (this.targetX === -1) {
+      this.targetX = null;
     }
   }
 
   rightUp() {
-    if (this.step === PADDLE_SPEED) {
-      this.step = 0;
+    if (this.targetX === PADDLE_END) {
+      this.targetX = null;
     }
   }
 
+  moveTo(x) {
+    this.targetX = x;
+  }
+
   update() {
-    if (this.step !== 0) {
-      this.x += this.step;
+    if (this.targetX !== null) {
+      if (Math.abs(this.targetX - this.x) <= PADDLE_SPEED) {
+        this.x = this.targetX;
+        this.targetX = null;
+      } else {
+        if (this.targetX < this.x) {
+          this.x -= PADDLE_SPEED;
+        } else {
+          this.x += PADDLE_SPEED;
+        }
+      }
 
       if (this.x < PADDLE_BEGIN) {
         this.x = PADDLE_BEGIN;
-        this.step = 0;
+        this.targetX = null;
       } else if (this.x > PADDLE_END) {
         this.x = PADDLE_END;
-        this.step = 0;
+        this.targetX = null;
       }
     }
   }

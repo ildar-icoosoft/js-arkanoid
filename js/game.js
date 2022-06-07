@@ -1,5 +1,5 @@
 import {Space} from "./space.js";
-import {Paddle, PADDLE_WIDTH} from "./paddle.js";
+import {Paddle} from "./paddle.js";
 import {Ball} from "./ball.js";
 import {LEVELS} from "./levels.js";
 import {makeBricks} from "./brick.js";
@@ -43,12 +43,15 @@ export class Game {
 
     document.addEventListener('mousemove', (event) => {
       const relativeX = event.clientX - this.space.canvas.offsetLeft;
-      this.paddle.x = relativeX - PADDLE_WIDTH / 2;
-      if (this.paddle.x < 0) {
-        this.paddle.x = 0;
-      } else if (this.paddle.x > this.space.canvas.width - PADDLE_WIDTH) {
-        this.paddle.x = this.space.canvas.width - PADDLE_WIDTH;
+
+      let targetX = relativeX - this.paddle.width / 2;
+      if (targetX < 0) {
+        targetX = 0;
       }
+      if (targetX > this.space.canvas.width - this.paddle.width) {
+        targetX = this.space.canvas.width - this.paddle.width;
+      }
+      this.paddle.moveTo(targetX);
     });
 
     window.addEventListener('blur', () => {

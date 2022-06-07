@@ -1,4 +1,5 @@
 #game-container canvas {
+  cursor: none;
   margin: 0 auto;
   display: block;
 }
