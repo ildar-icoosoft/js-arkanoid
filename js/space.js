@@ -12,7 +12,6 @@ const LEVEL_Y = SPACE_HEIGHT - 20;
 const MESSAGE_X = Math.floor(SPACE_WIDTH / 2);
 const MESSAGE_Y = Math.floor(SPACE_HEIGHT / 2);
 
-const BACKGROUND_IMG_URL = 'images/background.png';
 
 /**
  * Space object.
@@ -22,9 +21,6 @@ const BACKGROUND_IMG_URL = 'images/background.png';
 export class Space {
   constructor(game, containerId) {
     this.game = game;
-
-    this.backgroundImage = new Image();
-    this.backgroundImage.src = BACKGROUND_IMG_URL;
 
     this.canvas = document.createElement('canvas');
     this.canvas.width = SPACE_WIDTH;
@@ -36,7 +32,11 @@ export class Space {
 
   clear() {
     this.context.clearRect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
-    this.context.drawImage(this.backgroundImage, 0, 0);
+
+    this.context.save();
+    this.context.fillStyle = "#0f0736";
+    this.context.fillRect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
+    this.context.restore();
 
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';

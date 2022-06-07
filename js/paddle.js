@@ -18,8 +18,6 @@ const PADDLE_END = SPACE_WIDTH - PADDLE_WIDTH;
  */
 export class Paddle {
   constructor() {
-    this.image = new Image();
-    this.image.src = 'images/paddle.png';
     this.reset();
   }
 
@@ -79,12 +77,10 @@ export class Paddle {
   }
 
   draw(context) {
-    context.drawImage(
-      this.image,
-      this.x,
-      this.y,
-      PADDLE_WIDTH,
-      PADDLE_HEIGHT);
+    context.save();
+    context.fillStyle = 'rgb(200, 121, 255)';
+    context.fillRect(this.x, this.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+    context.restore();
   }
 
   box() {

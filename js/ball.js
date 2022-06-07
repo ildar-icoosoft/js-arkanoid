@@ -51,13 +51,12 @@ export class Ball {
   }
 
   draw(context) {
-    context.drawImage(
-      this.image,
-      this.x,
-      this.y,
-      this.width,
-      this.height
-    );
+    context.save();
+    context.fillStyle = '#fff';
+    context.beginPath();
+    context.arc(this.x, this.y, this.width / 2, 0, 2 * Math.PI, false);
+    context.fill();
+    context.restore();
   }
 
   box() {
