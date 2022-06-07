@@ -15,8 +15,6 @@ const BALL_Y = 400;
  */
 export class Ball {
   constructor() {
-    this.image = new Image();
-    this.image.src = 'images/ball.png';
     this.reset();
   }
 
@@ -52,9 +50,11 @@ export class Ball {
 
   draw(context) {
     context.save();
-    context.fillStyle = '#fff';
+
+    const radius = this.width / 2;
+
     context.beginPath();
-    context.arc(this.x, this.y, this.width / 2, 0, 2 * Math.PI, false);
+    context.arc(this.x + radius, this.y + radius, radius, 0, 2 * Math.PI, false);
     context.fill();
     context.restore();
   }
