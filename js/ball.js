@@ -27,28 +27,6 @@ export class Ball {
     this.height = BALL_HEIGHT;
   }
 
-  update() {
-    let newX = this.x + this.xStep;
-    let newY = this.y + this.yStep;
-
-    if (newX < 0 || newX > SPACE_WIDTH - this.width) {
-      this.xStep *= -1;
-      newX = this.x + this.xStep;
-    }
-    if (newY < 0) {
-      this.yStep *= -1;
-      newY = this.y + this.yStep;
-    }
-
-    this.x = newX;
-    this.y = newY;
-  }
-
-  bounceY() {
-    this.yStep *= -1;
-    this.update();
-  }
-
   draw(context) {
     context.save();
 
