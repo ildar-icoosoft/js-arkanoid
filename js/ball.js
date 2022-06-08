@@ -31,22 +31,13 @@ export class Ball {
     let newX = this.x + this.xStep;
     let newY = this.y + this.yStep;
 
-    const rightBorder = SPACE_WIDTH - this.width;
-
-    if (newX < 0) {
-      newY = (0 - this.x) * (newY - this.y) / (newX - this.x) + this.y;
-      newX = 0;
+    if (newX < 0 || newX > SPACE_WIDTH - this.width) {
       this.xStep *= -1;
-    } else if (newX > rightBorder) {
-      newY = (rightBorder - this.x) * (newY - this.y) / (newX - this.x) + this.y;
-      newX = rightBorder;
-      this.xStep *= -1;
+      newX = this.x + this.xStep;
     }
-
     if (newY < 0) {
-      newX = (0 - this.y) * (newX - this.x) / (newY - this.y) + this.x;
-      newY = 0;
       this.yStep *= -1;
+      newY = this.y + this.yStep;
     }
 
     this.x = newX;
