@@ -28,19 +28,29 @@ export class Ball {
   }
 
   update() {
-    this.x += this.xStep;
-    this.y += this.yStep;
+    let newX = this.x + this.xStep;
+    let newY = this.y + this.yStep;
 
-    if ((this.x < 0) || (this.x + this.width > SPACE_WIDTH)) {
-      this.bounceX();
-    } else if (this.y < 0) {
-      this.bounceY();
+    const rightBorder = SPACE_WIDTH - this.width;
+
+    if (newX < 0) {
+      newY = (0 - this.x) * (newY - this.y) / (newX - this.x) + this.y;
+      newX = 0;
+      this.xStep *= -1;
+    } else if (newX > rightBorder) {
+      newY = (rightBorder - this.x) * (newY - this.y) / (newX - this.x) + this.y;
+      newX = rightBorder;
+      this.xStep *= -1;
     }
-  }
 
-  bounceX() {
-    this.xStep *= -1;
-    this.update();
+    if (newY < 0) {
+      newX = (0 - this.y) * (newX - this.x) / (newY - this.y) + this.x;
+      newY = 0;
+      this.yStep *= -1;
+    }
+
+    this.x = newX;
+    this.y = newY;
   }
 
   bounceY() {
