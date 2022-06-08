@@ -1,4 +1,4 @@
-import {Space} from "./space.js";
+import {Space, SPACE_WIDTH} from "./space.js";
 import {Paddle} from "./paddle.js";
 import {Ball} from "./ball.js";
 import {LEVELS} from "./levels.js";
@@ -78,7 +78,31 @@ export class Game {
 
   update() {
     this.paddle.update();
-    this.ball.update();
+    this.updateBall();
+  }
+
+  updateBall() {
+    const ball = this.ball;
+
+    let newX = ball.x + ball.xStep;
+    let newY = ball.y + ball.yStep;
+
+    if (newX < 0 || newX > SPACE_WIDTH - ball.width) {
+      ball.xStep *= -1;
+      newX = ball.x + ball.xStep;
+    }
+    if (newY < 0) {
+      ball.yStep *= -1;
+      newY = ball.y + ball.yStep;
+    }
+
+    ball.x = newX;
+    ball.y = newY;
+  }
+
+  bounceY() {
+    this.ball.yStep *= -1;
+    this.updateBall();
   }
 
   reset() {
@@ -98,7 +122,7 @@ export class Game {
 
     for (const brick of this.bricks) {
       if (brick.intact() && isColliding(ballBox, brick.box())) {
-        this.ball.bounceY();
+        this.bounceY();
 
         brick.hit();
         if (!brick.intact()) {
@@ -122,7 +146,7 @@ export class Game {
     if (this.ball.y > this.space.canvas.height - this.ball.height) {
       this.gameOver = true;
     } else if (isColliding(this.paddle.box(), this.ball.box())) {
-      this.ball.bounceY();
+      this.bounceY();
     } else {
       this.checkBallCollidingBricks();
       if (this.intactBricksCount() === 0) {
