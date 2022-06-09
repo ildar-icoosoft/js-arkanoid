@@ -1,9 +1,6 @@
 'use strict';
 
-import { SPACE_WIDTH } from './space.js';
-
 const BALL_WIDTH = 20;
-const BALL_HEIGHT = 20;
 const BALL_SPEED = 5;
 const BALL_X = 400;
 const BALL_Y = 400;
@@ -24,7 +21,6 @@ export class Ball {
     this.xStep = BALL_SPEED;
     this.yStep = BALL_SPEED;
     this.width = BALL_WIDTH;
-    this.height = BALL_HEIGHT;
   }
 
   draw(context) {
@@ -43,7 +39,7 @@ export class Ball {
       lx: this.x,
       ly: this.y,
       rx: this.x + this.width,
-      ry: this.y + this.height
+      ry: this.y + this.width
     };
   }
 }
