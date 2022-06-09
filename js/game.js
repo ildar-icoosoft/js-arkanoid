@@ -3,7 +3,7 @@ import {Paddle} from "./paddle.js";
 import {Ball} from "./ball.js";
 import {LEVELS} from "./levels.js";
 import {makeBricks} from "./brick.js";
-import {isColliding} from './utils.js';
+import {getNewBallDirection, isColliding} from './utils.js';
 
 export class Game {
   constructor(containerId) {
@@ -78,10 +78,10 @@ export class Game {
 
   update() {
     this.paddle.update();
-    this.updateBall();
+    this.updateBallCoordinates();
   }
 
-  updateBall() {
+  updateBallCoordinates() {
     const ball = this.ball;
 
     let newX = ball.x + ball.xStep;
@@ -96,13 +96,31 @@ export class Game {
       newY = ball.y + ball.yStep;
     }
 
+    for (const brick of this.bricks) {
+      if (brick.intact() && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, brick.box())) {
+        const [newXStep, newYStep] = getNewBallDirection(this.ball, brick.box());
+        ball.xStep = newXStep;
+        ball.yStep = newYStep;
+
+        newX = ball.x + ball.xStep;
+        newY = ball.y + ball.yStep;
+
+        brick.hit();
+        if (!brick.intact()) {
+          this.score++;
+        }
+
+        break;
+      }
+    }
+
     ball.x = newX;
     ball.y = newY;
   }
 
   bounceY() {
     this.ball.yStep *= -1;
-    this.updateBall();
+    this.updateBallCoordinates();
   }
 
   reset() {
@@ -117,23 +135,6 @@ export class Game {
     this.score = 0;
   }
 
-  checkBallCollidingBricks() {
-    const ballBox = this.ball.box();
-
-    for (const brick of this.bricks) {
-      if (brick.intact() && isColliding(ballBox, brick.box())) {
-        this.bounceY();
-
-        brick.hit();
-        if (!brick.intact()) {
-          this.score++;
-        }
-
-        break;
-      }
-    }
-  }
-
   intactBricksCount() {
     return this.bricks.length - this.score;
   }
@@ -143,12 +144,11 @@ export class Game {
 
     this.update();
 
-    if (this.ball.y > this.space.canvas.height - this.ball.height) {
+    if (this.ball.y > this.space.canvas.height - this.ball.width) {
       this.gameOver = true;
     } else if (isColliding(this.paddle.box(), this.ball.box())) {
       this.bounceY();
     } else {
-      this.checkBallCollidingBricks();
       if (this.intactBricksCount() === 0) {
         this.gameOver = true;
         youWin = true;
