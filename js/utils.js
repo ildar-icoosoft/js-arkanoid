@@ -69,7 +69,7 @@ export function calculateCollision(ball, brickBox) {
     tX = Math.abs((maxX - ballBox.lx) / ball.xStep);
   }
   if (maxY !== null) {
-    tY = Math.abs((maxY - ballBox.lx) / ball.yStep);
+    tY = Math.abs((maxY - ballBox.ly) / ball.yStep);
   }
 
   const t = Math.max(tX, tY);
@@ -84,7 +84,7 @@ export function calculateCollision(ball, brickBox) {
       collisionCoordinates: {
         x: bX,
         y: bY
-      }
+      },
     }
   } else {
     return {
@@ -93,7 +93,33 @@ export function calculateCollision(ball, brickBox) {
       collisionCoordinates: {
         x: bX,
         y: bY
-      }
+      },
     }
   }
 }
+
+export function bounceFromPaddle(ball, paddle, collisionCoordinates) {
+  /**
+   *  Расстояние от левого края лопатки до точки, куда ударился шарик. 0 - самая левая точка, 1 - самая правая
+    * @type {number}
+   */
+  const pointFromLeft = (collisionCoordinates.x + ball.width - paddle.x) / (paddle.width + ball.width);
+
+  const k = 0.25; // ограничение, чтобы при ударе шарика о край, он не летел слишком горизонтально
+
+  /**
+   * Расстояние от середины лопатки до точки, куда ударился шарик. От 0 до 1. 0 - середина. 1 - левый и правый край.
+   * @type {number}
+   */
+  let pointFromMiddle = Math.abs(2 * pointFromLeft - 1 - k);
+
+  const angle = Math.atan2(ball.yStep, ball.xStep) * 180 / Math.PI;
+
+  const newAngle = pointFromLeft < 0.5 ? (1 - pointFromMiddle) * (180 - angle) : 180 - (1 - pointFromMiddle) * angle;
+
+  const stepLength = Math.sqrt(ball.xStep ** 2 + ball.yStep ** 2);
+
+  ball.xStep = -Math.cos(newAngle * Math.PI / 180) * stepLength;
+  ball.yStep = -Math.sin(newAngle * Math.PI / 180) * stepLength;
+}
+
