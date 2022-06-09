@@ -4,6 +4,7 @@ import {Ball} from "./ball.js";
 import {LEVELS} from "./levels.js";
 import {makeBricks} from "./brick.js";
 import {
+  bounceFromPaddle,
   calculateCollision,
   calculateWallCollision,
   isColliding
@@ -124,7 +125,7 @@ export class Game {
       if (paddleCollision.plane === 'vertical') {
         ball.xStep *= -1;
       } else if (paddleCollision.plane === 'horizontal') {
-        ball.yStep *= -1;
+        bounceFromPaddle(ball, this.paddle, paddleCollision.collisionCoordinates);
       }
       this.ball.markAsHitByPaddle();
     }
