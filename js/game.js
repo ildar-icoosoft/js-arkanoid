@@ -1,9 +1,13 @@
-import {Space, SPACE_WIDTH} from "./space.js";
+import {Space} from "./space.js";
 import {Paddle} from "./paddle.js";
 import {Ball} from "./ball.js";
 import {LEVELS} from "./levels.js";
 import {makeBricks} from "./brick.js";
-import {getNewBallDirection, isColliding} from './utils.js';
+import {
+  calculateCollision,
+  calculateWallCollision,
+  isColliding
+} from './utils.js';
 
 export class Game {
   constructor(containerId) {
@@ -82,28 +86,64 @@ export class Game {
   }
 
   updateBallCoordinates() {
+    this.handleWallCollision();
+
+    this.handleBrickCollision();
+
+    this.handlePaddleCollision();
+
     const ball = this.ball;
 
-    let newX = ball.x + ball.xStep;
-    let newY = ball.y + ball.yStep;
+    ball.x += ball.xStep;
+    ball.y += ball.yStep;
+  }
 
-    if (newX < 0 || newX > SPACE_WIDTH - ball.width) {
+  handleWallCollision() {
+    const ball = this.ball;
+
+    const wallCollision = calculateWallCollision(ball);
+    if (wallCollision.includes('vertical')) {
       ball.xStep *= -1;
-      newX = ball.x + ball.xStep;
     }
-    if (newY < 0) {
+    if (wallCollision.includes('horizontal')) {
       ball.yStep *= -1;
-      newY = ball.y + ball.yStep;
     }
+    if (wallCollision.length) {
+      this.ball.markAsHitByWall();
+    }
+  }
 
+  handlePaddleCollision() {
+    const ball = this.ball;
+
+    const newX = ball.x + ball.xStep;
+    const newY = ball.y + ball.yStep;
+
+    if (this.ball.lastHitBy !== 'paddle' && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, this.paddle.box())) {
+      const paddleCollision = calculateCollision(this.ball, this.paddle.box());
+      if (paddleCollision.plane === 'vertical') {
+        ball.xStep *= -1;
+      } else if (paddleCollision.plane === 'horizontal') {
+        ball.yStep *= -1;
+      }
+      this.ball.markAsHitByPaddle();
+    }
+  }
+
+  handleBrickCollision() {
+    const ball = this.ball;
+
+    const newX = ball.x + ball.xStep;
+    const newY = ball.y + ball.yStep;
     for (const brick of this.bricks) {
       if (brick.intact() && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, brick.box())) {
-        const [newXStep, newYStep] = getNewBallDirection(this.ball, brick.box());
-        ball.xStep = newXStep;
-        ball.yStep = newYStep;
-
-        newX = ball.x + ball.xStep;
-        newY = ball.y + ball.yStep;
+        const brickCollision = calculateCollision(this.ball, brick.box());
+        if (brickCollision.plane === 'vertical') {
+          ball.xStep *= -1;
+        } else {
+          ball.yStep *= -1;
+        }
+        this.ball.markAsHitByBrick();
 
         brick.hit();
         if (!brick.intact()) {
@@ -113,14 +153,6 @@ export class Game {
         break;
       }
     }
-
-    ball.x = newX;
-    ball.y = newY;
-  }
-
-  bounceY() {
-    this.ball.yStep *= -1;
-    this.updateBallCoordinates();
   }
 
   reset() {
@@ -146,8 +178,6 @@ export class Game {
 
     if (this.ball.y > this.space.canvas.height - this.ball.width) {
       this.gameOver = true;
-    } else if (isColliding(this.paddle.box(), this.ball.box())) {
-      this.bounceY();
     } else {
       if (this.intactBricksCount() === 0) {
         this.gameOver = true;
