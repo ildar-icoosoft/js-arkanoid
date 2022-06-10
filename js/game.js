@@ -14,7 +14,8 @@ export const GameStatus = {
   INTRO: 'INTRO', // Вступительная заставка
   STARTED: 'STARTED', // Игра началась
   PAUSED: 'PAUSED', // Игра на паузе
-  YOU_WIN: 'YOU_WIN', // Игрок прошёл все уровни
+  WIN_LEVEL: 'WIN_LEVEL', // Игрок прошёл все уровни
+  WIN_GAME: 'WIN_GAME', // Игрок прошёл все уровни
   LOST_LIFE: 'LOST_LIFE', // Игрок проиграл (потерял 1 жизнь)
   GAME_OVER: 'GAME_OVER' // Игра окончена. Пользователь проиграл
 };
@@ -82,7 +83,9 @@ export class Game {
           break;
 
         case GameStatus.GAME_OVER:
-        case GameStatus.YOU_WIN:
+        case GameStatus.WIN_GAME:
+          this.level = 0;
+          this.bricks = makeBricks(LEVELS[this.level]);
           this.reset();
           this.start();
           break;
@@ -205,7 +208,7 @@ export class Game {
   }
 
   intactBricksCount() {
-    return this.bricks.length - this.score;
+    return this.bricks.filter(brick => brick.intact()).length;
   }
 
   gameLoop() {
@@ -220,7 +223,12 @@ export class Game {
       }
     } else {
       if (this.intactBricksCount() === 0) {
-        this.status = GameStatus.YOU_WIN;
+        if (this.level < LEVELS.length - 1) {
+          this.level++;
+          this.status = GameStatus.WIN_LEVEL;
+        } else {
+          this.status = GameStatus.WIN_GAME;
+        }
       }
     }
 
@@ -243,7 +251,21 @@ export class Game {
 
         break;
 
-      case GameStatus.YOU_WIN:
+      case GameStatus.WIN_LEVEL:
+        this.bricks = makeBricks(LEVELS[this.level]);
+
+        this.paddle.reset();
+        this.ball.reset();
+
+        this.bricks.forEach((brick) => {
+          brick.reset();
+        });
+
+        this.start();
+
+        break;
+
+      case GameStatus.WIN_GAME:
         this.space.drawYouWin();
 
         break;
