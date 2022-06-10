@@ -52,6 +52,10 @@ export class Space {
     this.context.fillText(message, MESSAGE_X, MESSAGE_Y);
   }
 
+  drawIntro() {
+    this.drawMessage('Welcome to Arkanoid. Click to start');
+  }
+
   drawGameOver() {
     this.drawMessage('GAME OVER');
   }
@@ -61,6 +65,6 @@ export class Space {
   }
 
   drawPause() {
-    this.drawMessage('PAUSE');
+    this.drawMessage('PAUSE. Click to resume');
   }
 }
