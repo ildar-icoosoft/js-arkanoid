@@ -14,11 +14,14 @@ export const GameStatus = {
   INTRO: 'INTRO', // Вступительная заставка
   STARTED: 'STARTED', // Игра началась
   PAUSED: 'PAUSED', // Игра на паузе
-  ENDED: 'ENDED' // Игра окончена. Отображается заставка
+  YOU_WIN: 'YOU_WIN', // Игрок прошёл все уровни
+  LOST_LIFE: 'LOST_LIFE', // Игрок проиграл (потерял 1 жизнь)
+  GAME_OVER: 'GAME_OVER' // Игра окончена. Пользователь проиграл
 };
 
 export class Game {
   constructor(containerId) {
+    this.livesCount = 3;
     this.status = GameStatus.INTRO;
     this.space = new Space(this, containerId);
     this.paddle = new Paddle();
@@ -78,7 +81,8 @@ export class Game {
           this.resume();
           break;
 
-        case GameStatus.ENDED:
+        case GameStatus.GAME_OVER:
+        case GameStatus.YOU_WIN:
           this.reset();
           this.start();
           break;
@@ -197,6 +201,7 @@ export class Game {
     });
 
     this.score = 0;
+    this.livesCount= 3;
   }
 
   intactBricksCount() {
@@ -204,16 +209,18 @@ export class Game {
   }
 
   gameLoop() {
-    let youWin = false;
-
     this.update();
 
     if (this.ball.y > this.space.canvas.height - this.ball.width) {
-      this.status = GameStatus.ENDED;
+      this.livesCount--;
+      if (this.livesCount === 0) {
+        this.status = GameStatus.GAME_OVER;
+      } else {
+        this.status = GameStatus.LOST_LIFE;
+      }
     } else {
       if (this.intactBricksCount() === 0) {
-        this.status = GameStatus.ENDED;
-        youWin = true;
+        this.status = GameStatus.YOU_WIN;
       }
     }
 
@@ -225,12 +232,19 @@ export class Game {
 
         break;
 
-      case GameStatus.ENDED:
-        if (youWin) {
-          this.space.drawYouWin();
-        } else {
-          this.space.drawGameOver();
-        }
+      case GameStatus.LOST_LIFE:
+        this.paddle.reset();
+        this.start();
+
+        break;
+
+      case GameStatus.GAME_OVER:
+        this.space.drawGameOver();
+
+        break;
+
+      case GameStatus.YOU_WIN:
+        this.space.drawYouWin();
 
         break;
 

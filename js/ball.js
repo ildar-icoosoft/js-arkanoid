@@ -23,6 +23,7 @@ export class Ball {
 
     const radius = this.width / 2;
 
+    context.fillStyle = 'white';
     context.beginPath();
     context.arc(this.x + radius, this.y + radius, radius, 0, 2 * Math.PI, false);
     context.fill();
