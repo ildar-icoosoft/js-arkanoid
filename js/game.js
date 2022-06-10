@@ -10,15 +10,21 @@ import {
   isColliding
 } from './utils.js';
 
+export const GameStatus = {
+  INTRO: 'INTRO', // Вступительная заставка
+  STARTED: 'STARTED', // Игра началась
+  PAUSED: 'PAUSED', // Игра на паузе
+  ENDED: 'ENDED' // Игра окончена. Отображается заставка
+};
+
 export class Game {
   constructor(containerId) {
+    this.status = GameStatus.INTRO;
     this.space = new Space(this, containerId);
     this.paddle = new Paddle();
     this.ball = new Ball();
     this.level = 0;
     this.bricks = makeBricks(LEVELS[this.level]);
-    this.gameOver = false;
-    this.gameOnPause = false;
     this.score = 0;
 
     document.addEventListener('keydown', (event) => {
@@ -32,12 +38,12 @@ export class Game {
     });
 
     document.addEventListener('keyup', (event) => {
-      if (this.gameOver) {
+      if (this.status === GameStatus.INTRO || this.status === GameStatus.ENDED) {
         if (event.key === 'Enter') {
           this.reset();
           this.start();
         }
-      } else {
+      } else if (this.status === GameStatus.STARTED) {
         if (event.key === 'ArrowLeft') {
           this.paddle.leftUp();
         } else if (event.key === 'ArrowRight') {
@@ -47,38 +53,40 @@ export class Game {
     });
 
     document.addEventListener('mousemove', (event) => {
-      const relativeX = event.clientX - this.space.canvas.offsetLeft;
+      if (this.status === GameStatus.STARTED) {
+        const relativeX = event.clientX - this.space.canvas.offsetLeft;
 
-      let targetX = relativeX - this.paddle.width / 2;
-      if (targetX < 0) {
-        targetX = 0;
+        let targetX = relativeX - this.paddle.width / 2;
+        if (targetX < 0) {
+          targetX = 0;
+        }
+        if (targetX > this.space.canvas.width - this.paddle.width) {
+          targetX = this.space.canvas.width - this.paddle.width;
+        }
+        this.paddle.moveTo(targetX);
       }
-      if (targetX > this.space.canvas.width - this.paddle.width) {
-        targetX = this.space.canvas.width - this.paddle.width;
-      }
-      this.paddle.moveTo(targetX);
     });
 
     window.addEventListener('blur', () => {
-      if (!this.gameOver && !this.gameOnPause) {
+      if (this.status === GameStatus.STARTED) {
         this.pause();
       }
     });
 
     window.addEventListener('click', () => {
-      if (this.gameOnPause) {
-        this.gameOnPause = false;
+      if (this.status === GameStatus.PAUSED) {
         this.start();
       }
     });
   }
 
   start() {
+    this.status = GameStatus.STARTED;
     this.gameLoop();
   }
 
   pause() {
-    this.gameOnPause = true;
+    this.status = GameStatus.PAUSED;
   }
 
   update() {
@@ -159,7 +167,6 @@ export class Game {
       brick.reset();
     });
 
-    this.gameOver = false;
     this.score = 0;
   }
 
@@ -173,23 +180,23 @@ export class Game {
     this.update();
 
     if (this.ball.y > this.space.canvas.height - this.ball.width) {
-      this.gameOver = true;
+      this.status = GameStatus.ENDED;
     } else {
       if (this.intactBricksCount() === 0) {
-        this.gameOver = true;
+        this.status = GameStatus.ENDED;
         youWin = true;
       }
     }
 
     this.space.clear();
 
-    if (this.gameOver) {
+    if (this.status === GameStatus.ENDED) {
       if (youWin) {
         this.space.drawYouWin();
       } else {
         this.space.drawGameOver();
       }
-    } else if (this.gameOnPause) {
+    } else if (this.status === GameStatus.PAUSED) {
       this.space.drawPause();
       this.draw();
     } else {
