@@ -15,8 +15,6 @@ const MESSAGE_Y = Math.floor(SPACE_HEIGHT / 2);
 
 /**
  * Space object.
- *
- * @author Onur Cinar
  */
 export class Space {
   constructor(game, containerId) {

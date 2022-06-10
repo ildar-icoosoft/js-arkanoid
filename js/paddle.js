@@ -13,8 +13,6 @@ const PADDLE_END = SPACE_WIDTH - PADDLE_WIDTH;
 
 /**
  * Paddle object.
- *
- * @author Onur Cinar
  */
 export class Paddle {
   constructor() {
