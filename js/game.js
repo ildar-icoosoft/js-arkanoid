@@ -28,7 +28,7 @@ export class Game {
     this.score = 0;
 
     document.addEventListener('keydown', (event) => {
-      if (!this.gameOver) {
+      if (this.status === GameStatus.STARTED) {
         if (event.key === 'ArrowLeft') {
           this.paddle.leftDown();
         } else if (event.key === 'ArrowRight') {
@@ -74,7 +74,7 @@ export class Game {
     });
 
     window.addEventListener('click', () => {
-      if (this.status === GameStatus.PAUSED) {
+      if (this.status === GameStatus.INTRO || this.status === GameStatus.PAUSED) {
         this.start();
       }
     });
@@ -190,18 +190,35 @@ export class Game {
 
     this.space.clear();
 
-    if (this.status === GameStatus.ENDED) {
-      if (youWin) {
-        this.space.drawYouWin();
-      } else {
-        this.space.drawGameOver();
-      }
-    } else if (this.status === GameStatus.PAUSED) {
-      this.space.drawPause();
-      this.draw();
-    } else {
-      this.draw();
-      window.requestAnimationFrame(() => this.gameLoop());
+    switch (this.status) {
+      case GameStatus.INTRO:
+        this.space.drawIntro();
+
+        break;
+
+      case GameStatus.ENDED:
+        if (youWin) {
+          this.space.drawYouWin();
+        } else {
+          this.space.drawGameOver();
+        }
+
+        break;
+
+      case GameStatus.PAUSED:
+        this.space.drawPause();
+        this.draw();
+
+        break;
+
+      case GameStatus.STARTED:
+        this.draw();
+        window.requestAnimationFrame(() => this.gameLoop());
+
+        break;
+
+      default:
+        throw Error(`unknown status ${this.status}`);
     }
   }
 
