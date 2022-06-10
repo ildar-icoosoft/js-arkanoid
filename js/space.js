@@ -50,7 +50,7 @@ export class Space {
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'right';
-    this.context.fillText(`Level: ${this.game.level}`, LEVEL_X, LEVEL_Y);
+    this.context.fillText(`Level: ${this.game.level + 1}`, LEVEL_X, LEVEL_Y);
     this.context.restore();
 
     this.context.save();
