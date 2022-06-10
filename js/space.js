@@ -9,6 +9,9 @@ const SCORE_Y = SPACE_HEIGHT - 20;
 const LEVEL_X = SPACE_WIDTH - 20;
 const LEVEL_Y = SPACE_HEIGHT - 20;
 
+const LIVES_X = SPACE_WIDTH - 20;
+const LIVES_Y = 30;
+
 const MESSAGE_X = Math.floor(SPACE_WIDTH / 2);
 const MESSAGE_Y = Math.floor(SPACE_HEIGHT / 2);
 
@@ -36,20 +39,35 @@ export class Space {
     this.context.fillRect(0, 0, SPACE_WIDTH, SPACE_HEIGHT);
     this.context.restore();
 
+    this.context.save();
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'left';
     this.context.fillText(`Score: ${this.game.score}`, SCORE_X, SCORE_Y);
+    this.context.restore();
 
+    this.context.save();
+    this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'right';
     this.context.fillText(`Level: ${this.game.level}`, LEVEL_X, LEVEL_Y);
+    this.context.restore();
+
+    this.context.save();
+    this.context.fillStyle = 'white';
+    this.context.font = '18px sans';
+    this.context.textAlign = 'right';
+    this.context.fillText(`Lives: ${this.game.livesCount}`, LIVES_X, LIVES_Y);
+    this.context.restore();
   }
 
   drawMessage(message) {
+    this.context.save();
+    this.context.fillStyle = 'white';
     this.context.font = '32px sans';
     this.context.textAlign = 'center';
     this.context.fillText(message, MESSAGE_X, MESSAGE_Y);
+    this.context.restore();
   }
 
   drawIntro() {
@@ -57,11 +75,11 @@ export class Space {
   }
 
   drawGameOver() {
-    this.drawMessage('GAME OVER');
+    this.drawMessage('GAME OVER. Click to start again');
   }
 
   drawYouWin() {
-    this.drawMessage('YOU WIN');
+    this.drawMessage('YOU WIN. Click to start again');
   }
 
   drawPause() {
