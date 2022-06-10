@@ -38,12 +38,7 @@ export class Game {
     });
 
     document.addEventListener('keyup', (event) => {
-      if (this.status === GameStatus.INTRO || this.status === GameStatus.ENDED) {
-        if (event.key === 'Enter') {
-          this.reset();
-          this.start();
-        }
-      } else if (this.status === GameStatus.STARTED) {
+      if (this.status === GameStatus.STARTED) {
         if (event.key === 'ArrowLeft') {
           this.paddle.leftUp();
         } else if (event.key === 'ArrowRight') {
@@ -73,14 +68,48 @@ export class Game {
       }
     });
 
-    window.addEventListener('click', () => {
-      if (this.status === GameStatus.INTRO || this.status === GameStatus.PAUSED) {
-        this.start();
+    const handleClickOrEnter = () => {
+      switch (this.status) {
+        case GameStatus.INTRO:
+          this.start();
+          break;
+
+        case GameStatus.PAUSED:
+          this.resume();
+          break;
+
+        case GameStatus.ENDED:
+          this.reset();
+          this.start();
+          break;
+
+        case GameStatus.STARTED:
+          if (this.paddle.ball) {
+            this.paddle.throwBall();
+          }
+
+          break;
       }
+    };
+
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'Enter') {
+        handleClickOrEnter();
+      }
+    });
+
+    window.addEventListener('click', () => {
+      handleClickOrEnter();
     });
   }
 
   start() {
+    this.status = GameStatus.STARTED;
+    this.paddle.stickBall(this.ball);
+    this.gameLoop();
+  }
+
+  resume() {
     this.status = GameStatus.STARTED;
     this.gameLoop();
   }

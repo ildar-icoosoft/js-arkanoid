@@ -17,6 +17,7 @@ const PADDLE_END = SPACE_WIDTH - PADDLE_WIDTH;
 export class Paddle {
   constructor() {
     this.reset();
+    this.ball = null; // липкая лопатка, которая перестаёт быть липкой после первого броска
   }
 
   reset() {
@@ -25,6 +26,17 @@ export class Paddle {
     this.width = PADDLE_WIDTH;
     this.height = PADDLE_HEIGHT;
     this.targetX = null; // точка, в которую направляется лопатка. null если она неподвижна
+  }
+
+  stickBall(ball) {
+    this.ball = ball;
+  }
+
+  throwBall() {
+    this.ball.xStep = 1;
+    this.ball.yStep = -6;
+
+    this.ball = null;
   }
 
   leftDown() {
@@ -71,6 +83,13 @@ export class Paddle {
         this.x = PADDLE_END;
         this.targetX = null;
       }
+    }
+
+    if (this.ball) {
+      this.ball.x = this.x + this.width / 2 - this.ball.width / 2;
+      this.ball.y = this.y - this.ball.width;
+      this.ball.xStep = 0;
+      this.ball.yStep = 0;
     }
   }
 
