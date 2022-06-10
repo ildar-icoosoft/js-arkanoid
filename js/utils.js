@@ -105,7 +105,7 @@ export function bounceFromPaddle(ball, paddle, collisionCoordinates) {
    */
   const pointFromLeft = (collisionCoordinates.x + ball.width - paddle.x) / (paddle.width + ball.width);
 
-  const k = 0.85; // коэффициент, чтобы при ударе шарика о край, он не летел слишком горизонтально
+  const k = 0.6; // коэффициент, чтобы при ударе шарика о край, он не летел слишком горизонтально
 
   /**
    * Расстояние от середины лопатки до точки, куда ударился шарик. От 0 до k. 0 - середина. k - левый и правый край.
