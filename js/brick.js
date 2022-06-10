@@ -16,8 +16,6 @@ const BRICKS_Y = 50;
 
 /**
  * Brick object.
- *
- * @author Onur Cinar
  */
 export class Brick {
   constructor(id, x, y, energy) {

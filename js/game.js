@@ -109,9 +109,6 @@ export class Game {
     if (wallCollision.includes('horizontal')) {
       ball.yStep *= -1;
     }
-    if (wallCollision.length) {
-      this.ball.markAsHitByWall();
-    }
   }
 
   handlePaddleCollision() {
@@ -120,14 +117,13 @@ export class Game {
     const newX = ball.x + ball.xStep;
     const newY = ball.y + ball.yStep;
 
-    if (this.ball.lastHitBy !== 'paddle' && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, this.paddle.box())) {
+    if (!isColliding(ball.box(), this.paddle.box()) && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, this.paddle.box())) {
       const paddleCollision = calculateCollision(this.ball, this.paddle.box());
       if (paddleCollision.plane === 'vertical') {
         ball.xStep *= -1;
       } else if (paddleCollision.plane === 'horizontal') {
         bounceFromPaddle(ball, this.paddle, paddleCollision.collisionCoordinates);
       }
-      this.ball.markAsHitByPaddle();
     }
   }
 
@@ -144,7 +140,6 @@ export class Game {
         } else {
           ball.yStep *= -1;
         }
-        this.ball.markAsHitByBrick();
 
         brick.hit();
         if (!brick.intact()) {
