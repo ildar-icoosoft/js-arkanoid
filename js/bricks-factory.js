@@ -1,6 +1,6 @@
 'use strict';
 
-import {SimpleBrick} from "./bricks/simple-brick.js";
+import {SimpleBrick} from "./models/bricks/simple-brick.js";
 
 const BRICK_PADDING = 5;
 const BRICK_WIDTH = 90;
