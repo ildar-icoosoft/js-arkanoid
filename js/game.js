@@ -1,298 +1,153 @@
 import {Space} from "./space.js";
-import {Paddle} from "./paddle.js";
-import {Ball} from "./ball.js";
+import {GameLayer} from "./layers/game-layer.js";
+import {PauseLayer} from "./layers/pause-layer.js";
+import {GameInfoLayer} from "./layers/game-info-layer.js";
+import {IntroLayer} from "./layers/intro-layer.js";
+import {GameOverLayer} from "./layers/game-over-layer.js";
+import {WinLayer} from "./layers/win-layer.js";
+import {Layers} from "./layers.js";
+import {BackgroundLayer} from "./layers/background-layer.js";
 import {LEVELS} from "./levels.js";
-import {makeBricks} from "./brick.js";
-import {
-  bounceFromPaddle,
-  calculateCollision,
-  calculateWallCollision,
-  isColliding
-} from './utils.js';
 
-export const GameStatus = {
-  INTRO: 'INTRO', // Вступительная заставка
-  STARTED: 'STARTED', // Игра началась
-  PAUSED: 'PAUSED', // Игра на паузе
-  WIN_LEVEL: 'WIN_LEVEL', // Игрок прошёл все уровни
-  WIN_GAME: 'WIN_GAME', // Игрок прошёл все уровни
-  LOST_LIFE: 'LOST_LIFE', // Игрок проиграл (потерял 1 жизнь)
-  GAME_OVER: 'GAME_OVER' // Игра окончена. Пользователь проиграл
-};
+const LIVES_COUNT = 3;
 
 export class Game {
   constructor(containerId) {
-    this.livesCount = 3;
-    this.status = GameStatus.INTRO;
-    this.space = new Space(this, containerId);
-    this.paddle = new Paddle();
-    this.ball = new Ball();
+    this.livesCount = LIVES_COUNT;
     this.level = 0;
-    this.bricks = makeBricks(LEVELS[this.level]);
     this.score = 0;
+    this.space = new Space(this, containerId);
 
-    document.addEventListener('keydown', (event) => {
-      if (this.status === GameStatus.STARTED) {
-        if (event.key === 'ArrowLeft') {
-          this.paddle.leftDown();
-        } else if (event.key === 'ArrowRight') {
-          this.paddle.rightDown();
-        }
+    const backgroundLayer = new BackgroundLayer(this);
+    const introLayer = new IntroLayer(this);
+    const gameLayer = new GameLayer(this);
+    const gameInfoLayer = new GameInfoLayer(this);
+    const pauseLayer = new PauseLayer(this);
+    const winLayer = new WinLayer(this);
+    const gameOverLayer = new GameOverLayer(this);
+
+    this.layers = new Layers({
+      background: backgroundLayer,
+      intro: introLayer,
+      game: gameLayer,
+      gameInfo: gameInfoLayer,
+      pause: pauseLayer,
+      win: winLayer,
+      gameOver: gameOverLayer,
+    });
+
+    introLayer.addEventListener('next', () => {
+      this.showGameScreen(false);
+    });
+
+    gameLayer.addEventListener('pause', () => {
+      this.showPauseScreen();
+    });
+
+    gameLayer.addEventListener('lose', () => {
+      this.livesCount--;
+      if (this.livesCount === 0) {
+        this.showGameOverScreen();
+      } else {
+        this.showGameScreen(true);
+        setTimeout(() => {
+          gameLayer.resurrect();
+          this.showGameScreen(false);
+        }, 1000);
       }
     });
 
-    document.addEventListener('keyup', (event) => {
-      if (this.status === GameStatus.STARTED) {
-        if (event.key === 'ArrowLeft') {
-          this.paddle.leftUp();
-        } else if (event.key === 'ArrowRight') {
-          this.paddle.rightUp();
-        }
-      }
+    gameLayer.addEventListener('hitBrick', () => {
+      this.score++;
+    })
+
+    pauseLayer.addEventListener('resume', () => {
+      this.showGameScreen(false);
     });
 
-    document.addEventListener('mousemove', (event) => {
-      if (this.status === GameStatus.STARTED) {
-        const relativeX = event.clientX - this.space.canvas.offsetLeft;
-
-        let targetX = relativeX - this.paddle.width / 2;
-        if (targetX < 0) {
-          targetX = 0;
-        }
-        if (targetX > this.space.canvas.width - this.paddle.width) {
-          targetX = this.space.canvas.width - this.paddle.width;
-        }
-        this.paddle.moveTo(targetX);
-      }
+    winLayer.addEventListener('restart', () => {
+      this.level = 0;
+      this.livesCount = LIVES_COUNT;
+      gameLayer.reset();
+      this.showGameScreen(false);
     });
 
-    window.addEventListener('blur', () => {
-      if (this.status === GameStatus.STARTED) {
-        this.pause();
-      }
+    gameOverLayer.addEventListener('restart', () => {
+      this.level = 0;
+      this.livesCount = LIVES_COUNT;
+      this.score = 0;
+      gameLayer.reset();
+      this.showGameScreen(false);
     });
 
-    const handleClickOrEnter = () => {
-      switch (this.status) {
-        case GameStatus.INTRO:
-          this.start();
-          break;
+    gameLayer.addEventListener('win', (event) => {
+      this.showGameScreen(true);
 
-        case GameStatus.PAUSED:
-          this.resume();
-          break;
-
-        case GameStatus.GAME_OVER:
-        case GameStatus.WIN_GAME:
-          this.level = 0;
-          this.bricks = makeBricks(LEVELS[this.level]);
-          this.reset();
-          this.start();
-          break;
-
-        case GameStatus.STARTED:
-          if (this.paddle.ball) {
-            this.paddle.throwBall();
-          }
-
-          break;
+      if (this.level < LEVELS.length - 1) {
+        this.level++;
+        setTimeout(() => {
+          gameLayer.reset();
+          this.showGameScreen(false);
+        }, 1000);
+      } else {
+        this.showWinScreen();
       }
-    };
-
-    document.addEventListener('keyup', (event) => {
-      if (event.key === 'Enter') {
-        handleClickOrEnter();
-      }
-    });
-
-    window.addEventListener('click', () => {
-      handleClickOrEnter();
     });
   }
 
   start() {
-    this.status = GameStatus.STARTED;
-    this.paddle.stickBall(this.ball);
-    this.gameLoop();
+    this.showIntroScreen();
   }
 
-  resume() {
-    this.status = GameStatus.STARTED;
-    this.gameLoop();
+  showIntroScreen() {
+    this.showLayers(['background', 'intro']);
   }
 
-  pause() {
-    this.status = GameStatus.PAUSED;
+  /**
+   * @param {boolean} paused
+   */
+  showGameScreen(paused) {
+    this.showLayers(['background', `game${paused ? '-' : ''}`, 'gameInfo']);
   }
 
-  update() {
-    this.paddle.update();
-    this.updateBallCoordinates();
+  showPauseScreen() {
+    this.showLayers(['background', 'game-', 'gameInfo', 'pause']);
   }
 
-  updateBallCoordinates() {
-    this.handleWallCollision();
-
-    this.handleBrickCollision();
-
-    this.handlePaddleCollision();
-
-    const ball = this.ball;
-
-    ball.x += ball.xStep;
-    ball.y += ball.yStep;
+  showGameOverScreen() {
+    this.showLayers(['background', 'game-', 'gameInfo', 'gameOver']);
   }
 
-  handleWallCollision() {
-    const ball = this.ball;
+  showWinScreen() {
+    this.showLayers(['background', 'game-', 'gameInfo', 'win']);
+  }
 
-    const wallCollision = calculateWallCollision(ball);
-    if (wallCollision.includes('vertical')) {
-      ball.xStep *= -1;
+  /**
+   * Показывает слои
+   * @param {string[]} layers - Идентификаторы слоёв
+   */
+  showLayers(layers) {
+    // Если у текущих слоёв нет анимации, то метод gameLoop не вызывается после каждого кадра и нужно будет вызвать
+    // gameLoop после установки видимых слоёв через setVisibleLayers()
+    let needToStartGameLoop = false;
+    if (!this.layers.hasAnimation()) {
+      needToStartGameLoop = true;
     }
-    if (wallCollision.includes('horizontal')) {
-      ball.yStep *= -1;
+    this.layers.setVisibleLayers(layers);
+    if (needToStartGameLoop) {
+      this.gameLoop();
     }
-  }
-
-  handlePaddleCollision() {
-    const ball = this.ball;
-
-    const newX = ball.x + ball.xStep;
-    const newY = ball.y + ball.yStep;
-
-    if (!isColliding(ball.box(), this.paddle.box()) && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, this.paddle.box())) {
-      const paddleCollision = calculateCollision(this.ball, this.paddle.box());
-      if (paddleCollision.plane === 'vertical') {
-        ball.xStep *= -1;
-      } else if (paddleCollision.plane === 'horizontal') {
-        bounceFromPaddle(ball, this.paddle, paddleCollision.collisionCoordinates);
-      }
-    }
-  }
-
-  handleBrickCollision() {
-    const ball = this.ball;
-
-    const newX = ball.x + ball.xStep;
-    const newY = ball.y + ball.yStep;
-    for (const brick of this.bricks) {
-      if (brick.intact() && isColliding({lx: newX, ly: newY, rx: newX + ball.width, ry: newY + ball.width}, brick.box())) {
-        const brickCollision = calculateCollision(this.ball, brick.box());
-        if (brickCollision.plane === 'vertical') {
-          ball.xStep *= -1;
-        } else {
-          ball.yStep *= -1;
-        }
-
-        brick.hit();
-        if (!brick.intact()) {
-          this.score++;
-        }
-
-        break;
-      }
-    }
-  }
-
-  reset() {
-    this.paddle.reset();
-    this.ball.reset();
-
-    this.bricks.forEach((brick) => {
-      brick.reset();
-    });
-
-    this.score = 0;
-    this.livesCount= 3;
-  }
-
-  intactBricksCount() {
-    return this.bricks.filter(brick => brick.intact()).length;
   }
 
   gameLoop() {
-    this.update();
-
-    if (this.ball.y > this.space.canvas.height - this.ball.width) {
-      this.livesCount--;
-      if (this.livesCount === 0) {
-        this.status = GameStatus.GAME_OVER;
-      } else {
-        this.status = GameStatus.LOST_LIFE;
-      }
-    } else {
-      if (this.intactBricksCount() === 0) {
-        if (this.level < LEVELS.length - 1) {
-          this.level++;
-          this.status = GameStatus.WIN_LEVEL;
-        } else {
-          this.status = GameStatus.WIN_GAME;
-        }
-      }
-    }
+    this.layers.update();
 
     this.space.clear();
 
-    switch (this.status) {
-      case GameStatus.INTRO:
-        this.space.drawIntro();
+    this.layers.draw();
 
-        break;
-
-      case GameStatus.LOST_LIFE:
-        this.paddle.reset();
-        this.start();
-
-        break;
-
-      case GameStatus.GAME_OVER:
-        this.space.drawGameOver();
-
-        break;
-
-      case GameStatus.WIN_LEVEL:
-        this.bricks = makeBricks(LEVELS[this.level]);
-
-        this.paddle.reset();
-        this.ball.reset();
-
-        this.bricks.forEach((brick) => {
-          brick.reset();
-        });
-
-        this.start();
-
-        break;
-
-      case GameStatus.WIN_GAME:
-        this.space.drawYouWin();
-
-        break;
-
-      case GameStatus.PAUSED:
-        this.space.drawPause();
-        this.draw();
-
-        break;
-
-      case GameStatus.STARTED:
-        this.draw();
-        window.requestAnimationFrame(() => this.gameLoop());
-
-        break;
-
-      default:
-        throw Error(`unknown status ${this.status}`);
+    if (this.layers.hasAnimation()) {
+      window.requestAnimationFrame(() => this.gameLoop());
     }
-  }
-
-  draw() {
-    this.paddle.draw(this.space.context);
-    this.ball.draw(this.space.context);
-
-    this.bricks.forEach((brick) => {
-      brick.draw(this.space.context);
-    });
   }
 }

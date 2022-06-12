@@ -25,9 +25,14 @@ export class Ball {
 
     context.fillStyle = 'white';
     context.beginPath();
-    context.arc(this.x + radius, this.y + radius, radius, 0, 2 * Math.PI, false);
+    context.arc(this.x + radius, this.y + radius, radius, 0, 2 * Math.PI);
     context.fill();
     context.restore();
+  }
+
+  update() {
+    this.x += this.xStep;
+    this.y += this.yStep;
   }
 
   box() {
