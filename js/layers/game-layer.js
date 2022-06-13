@@ -22,24 +22,24 @@ export class GameLayer extends BaseLayer {
   }
 
   keyDownHandler = (event) => {
-    if (event.key === 'ArrowLeft') {
+    if (event.code === 'ArrowLeft') {
       this.paddle.moveTo(0);
-    } else if (event.key === 'ArrowRight') {
+    } else if (event.code === 'ArrowRight') {
       this.paddle.moveTo(this.space.width - this.paddle.width);
     }
   };
 
   keyUpHandler = (event) => {
-    if (event.key === 'Enter') {
+    if (event.code === 'Enter' || event.code === 'Space') {
       if (this.paddle.ball) {
         this.paddle.throwBall();
       }
-    } else if (event.key === 'ArrowLeft') {
+    } else if (event.code === 'ArrowLeft') {
       // Останавливать движение лопатки нужно только если ранее была нажата та же кнопка
       if (this.paddle.targetX === 0) {
         this.paddle.stopMove();
       }
-    } else if (event.key === 'ArrowRight') {
+    } else if (event.code === 'ArrowRight') {
       // Останавливать движение лопатки нужно только если ранее была нажата та же кнопка
       if (this.paddle.targetX === this.space.width - this.paddle.width) {
         this.paddle.stopMove();

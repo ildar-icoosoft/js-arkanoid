@@ -2,7 +2,7 @@ import {BaseLayer} from "./base-layer.js";
 
 export class GameOverLayer extends BaseLayer {
   keyUpHandler = (event) => {
-    if (event.key === 'Enter') {
+    if (event.code === 'Enter' || event.code === 'Space') {
       this.repo.restartGame();
     }
   }

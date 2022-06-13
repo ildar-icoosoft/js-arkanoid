@@ -2,7 +2,7 @@
 
 const PADDLE_WIDTH = 120;
 const PADDLE_HEIGHT = 20;
-const PADDLE_SPEED = 25;
+const PADDLE_SPEED = 15;
 const PADDLE_BOTTOM = 40;
 
 export class Paddle {
