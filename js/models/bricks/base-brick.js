@@ -1,10 +1,7 @@
 'use strict';
 
-import {BaseModel} from "../base-model.js";
-
-export class BaseBrick extends BaseModel {
+export class BaseBrick {
   constructor(x, y, width, height) {
-    super();
     if (this.constructor === BaseBrick) {
       throw new Error("Abstract classes can't be instantiated.");
     }
