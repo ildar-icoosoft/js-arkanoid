@@ -1,12 +1,9 @@
 'use strict';
 
-import {BaseModel} from "./base-model.js";
-
 const BALL_WIDTH = 20;
 
-export class Ball extends BaseModel {
+export class Ball {
   constructor() {
-    super();
     this.reset();
   }
 

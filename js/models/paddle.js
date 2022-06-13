@@ -1,15 +1,12 @@
 'use strict';
 
-import {BaseModel} from "./base-model.js";
-
 const PADDLE_WIDTH = 150;
 const PADDLE_HEIGHT = 25;
 const PADDLE_SPEED = 25;
 const PADDLE_BOTTOM = 100;
 
-export class Paddle extends BaseModel {
+export class Paddle {
   constructor(space) {
-    super();
     this.ball = null;
     this.speed = PADDLE_SPEED;
     this.space = space;
