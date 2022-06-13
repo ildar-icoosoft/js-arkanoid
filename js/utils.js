@@ -1,5 +1,11 @@
 import {SPACE_WIDTH} from "./space.js";
 
+/**
+ * Возвращает true, если две прямоугольника пересекаются. Иначе false
+ * @param box1
+ * @param box2
+ * @return {boolean}
+ */
 export function isColliding(box1, box2) {
   if ((box1.rx < box2.lx) || (box2.rx < box1.lx)) {
     return false;

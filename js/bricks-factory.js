@@ -30,6 +30,9 @@ const bricksMap = {
   ye: YellowBrick
 }
 
+/**
+ * @param {string[]} level
+ */
 export const makeBricks = (level) => {
   const bricks = [];
 

@@ -1,6 +1,12 @@
 'use strict';
 
 export class BaseBrick {
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
   constructor(x, y, width, height) {
     if (this.constructor === BaseBrick) {
       throw new Error("Abstract classes can't be instantiated.");
@@ -22,7 +28,11 @@ export class BaseBrick {
     this.intact = false;
   }
 
-  draw(_context) {
+  /**
+   * @param {CanvasRenderingContext2D} context
+   * @abstract
+   */
+  draw(context) {
     throw new Error("draw() method must be implemented");
   }
 

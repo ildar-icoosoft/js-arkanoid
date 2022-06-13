@@ -3,7 +3,15 @@
 export const SPACE_WIDTH = 600;
 export const SPACE_HEIGHT = 600;
 
+/**
+ * Класс для управления холстом. Отвечает за создание холста, масштабирования
+ * по размерам элемента-контейнера и за очистку холста.
+ */
 export class Space {
+  /**
+   * @param {Game} game
+   * @param {string} containerId
+   */
   constructor(game, containerId) {
     /**
      * Ширина холста без учёта масштабирования

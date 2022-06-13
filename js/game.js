@@ -10,6 +10,9 @@ import {BackgroundLayer} from "./layers/background-layer.js";
 import {GameRepository} from "./game-repository.js";
 
 export class Game {
+  /**
+   * @param {string} containerId
+   */
   constructor(containerId) {
     this.space = new Space(this, containerId);
     this.repo = new GameRepository();

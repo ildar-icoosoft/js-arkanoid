@@ -3,6 +3,12 @@
 import {BaseBrick} from "./base-brick.js";
 
 export class RedBrick extends BaseBrick {
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
   constructor(x, y, width, height) {
     super(x, y, width, height);
 

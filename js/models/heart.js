@@ -10,6 +10,9 @@ export class Heart {
     this.image.src = 'img/heart.svg';
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} context
+   */
   draw(context) {
     context.drawImage(
       this.image,
