@@ -21,7 +21,7 @@ export class GameRepository extends EventTarget {
   }
 
   showGameScreen() {
-    this.layers = ['background', 'game', 'gameInfo'];
+    this.layers = ['background', 'gameInfo', 'game', ];
     this.updateLayersList_();
   }
 
