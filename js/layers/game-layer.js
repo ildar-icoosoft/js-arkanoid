@@ -48,7 +48,7 @@ export class GameLayer extends BaseLayer {
   };
 
   mouseMoveHandler = (event) => {
-    const relativeX = event.clientX - this.space.canvas.offsetLeft;
+    const relativeX = (event.clientX - this.space.canvas.offsetLeft) / this.space.ratio;
 
     let targetX = relativeX - this.paddle.width / 2;
     if (targetX < 0) {
