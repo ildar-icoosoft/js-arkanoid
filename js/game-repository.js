@@ -45,7 +45,6 @@ export class GameRepository extends EventTarget {
 
   /**
    * Обновляет список слоёв (при этом автоматически убирается пауза со всех слоёв, если она была)
-   * @param {string[]} layers - Идентификаторы слоёв на холсте
    * @private
    */
   updateLayersList_() {

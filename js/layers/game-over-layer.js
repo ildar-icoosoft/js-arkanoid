@@ -21,7 +21,11 @@ export class GameOverLayer extends BaseLayer {
     document.removeEventListener('click', this.mouseClickHandler);
   }
 
-  drawMessage(message) {
+  /**
+   * @param {string} message
+   * @private
+   */
+  drawMessage_(message) {
     const x = Math.floor(this.space.width / 2);
     const y = Math.floor(this.space.height / 2);
 
@@ -59,6 +63,6 @@ export class GameOverLayer extends BaseLayer {
   }
 
   draw() {
-    this.drawMessage('GAME OVER');
+    this.drawMessage_('GAME OVER');
   }
 }

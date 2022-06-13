@@ -21,7 +21,11 @@ export class IntroLayer extends BaseLayer {
     document.removeEventListener('click', this.mouseClickHandler);
   }
 
-  drawMessage(message) {
+  /**
+   * @param {string} message
+   * @private
+   */
+  drawMessage_(message) {
     const x = Math.floor(this.space.width / 2);
     const y = Math.floor(this.space.height / 2);
 
@@ -62,6 +66,6 @@ export class IntroLayer extends BaseLayer {
   }
 
   draw() {
-    this.drawMessage('Arkanoid');
+    this.drawMessage_('Arkanoid');
   }
 }

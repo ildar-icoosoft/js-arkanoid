@@ -21,7 +21,7 @@ export function isColliding(box1, box2) {
 /**
  * Вычисляет, произошёл ли удар со стеной
  * @todo Вместо этого нужно будет заранее (в момент начала движения шарика) вычислять, когда произойдет удар
- * @param ball
+ * @param {Ball} ball
  * @returns {('horizontal' | 'vertical')[]}
  */
 export function calculateWallCollision(ball) {
@@ -43,8 +43,8 @@ export function calculateWallCollision(ball) {
 /**
  * Вычисляет момент столкновения шарика с препятствием
  * @todo. Определять, что шарик никогда не попадёт в фигуру
- * @param ball - шарик в любой момент времени до столкновения
- * @param brickBox - границы кирпича
+ * @param {Ball} ball - шарик в любой момент времени до столкновения
+ * @param {{rx: number, ry: number, lx: number, ly: number}} brickBox - границы кирпича
  * @returns {{plane: 'horizontal' | 'vertical', collisionCoordinates: {x: number, y: number}, steps: number}}
  * plane. vertical - если удар пришёлся на вертикальную плоскость (боковую). horizontal - если на горизонтальную (верх или низ).
  * collisionCoordinates. x - координата x левого верхнего угла шарика (шарик у нас на самом деле квадрат). y - координата y левого верхнего угла шарика
@@ -104,6 +104,12 @@ export function calculateCollision(ball, brickBox) {
   }
 }
 
+/**
+ * Делает отскок шарика от лопатки
+ * @param {Ball} ball
+ * @param {Paddle} paddle
+ * @param {{x: number, y: number}} collisionCoordinates
+ */
 export function bounceFromPaddle(ball, paddle, collisionCoordinates) {
   /**
    *  Расстояние от левого края лопатки до точки, куда ударился шарик. 0 - самая левая точка, 1 - самая правая
