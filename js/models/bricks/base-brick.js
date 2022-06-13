@@ -36,6 +36,9 @@ export class BaseBrick {
     throw new Error("draw() method must be implemented");
   }
 
+  /**
+   * @return {{rx: number, ry: number, lx: number, ly: number}}
+   */
   box() {
     return {
       lx: this.x,

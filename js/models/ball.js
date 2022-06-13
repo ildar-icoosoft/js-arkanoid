@@ -39,6 +39,9 @@ export class Ball {
     this.y += this.yStep;
   }
 
+  /**
+   * @return {{rx: number, ry: number, lx: number, ly: number}}
+   */
   box() {
     return {
       lx: this.x,

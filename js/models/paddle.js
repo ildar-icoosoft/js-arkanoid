@@ -81,6 +81,9 @@ export class Paddle {
     context.restore();
   }
 
+  /**
+   * @return {{rx: number, ry: number, lx: number, ly: number}}
+   */
   box() {
     return {
       lx: this.x,
