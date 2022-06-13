@@ -1,3 +1,12 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#game-container {
+  height: 100%;
+}
+
 #game-container canvas {
   cursor: none;
   margin: 0 auto;
