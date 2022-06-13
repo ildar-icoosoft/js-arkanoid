@@ -34,6 +34,9 @@ export class Paddle {
     this.ball = null;
   }
 
+  /**
+   * @param {number} x
+   */
   moveTo(x) {
     this.targetX = x;
   }
@@ -62,6 +65,9 @@ export class Paddle {
     }
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} context
+   */
   draw(context) {
     context.save();
 
