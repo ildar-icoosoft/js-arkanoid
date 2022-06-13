@@ -1,10 +1,8 @@
-export class BaseLayer extends EventTarget {
+export class BaseLayer {
   /**
    * @param {Game} game
    */
   constructor(game) {
-    super();
-
     if (this.constructor === BaseLayer) {
       throw new Error("Abstract classes can't be instantiated.");
     }
@@ -13,7 +11,22 @@ export class BaseLayer extends EventTarget {
     this.game = game;
     this.space = game.space;
     this.context = game.space.context;
+    this.repo = game.repo;
     this.paused = false;
+  }
+
+  pause() {
+    if (!this.paused) {
+      this.paused = true;
+      this.onDeactivate();
+    }
+  }
+
+  resume() {
+    if (this.paused) {
+      this.paused = false;
+      this.onActivate();
+    }
   }
 
   update() {}

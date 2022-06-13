@@ -12,27 +12,27 @@ const LIVES_Y = 30;
 
 export class GameInfoLayer extends BaseLayer {
   draw() {
-    const game = this.game;
+    const repo = this.repo;
 
     this.context.save();
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'left';
-    this.context.fillText(`Score: ${game.score}`, SCORE_X, SCORE_Y);
+    this.context.fillText(`Score: ${repo.score}`, SCORE_X, SCORE_Y);
     this.context.restore();
 
     this.context.save();
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'right';
-    this.context.fillText(`Level: ${game.level + 1}`, LEVEL_X, LEVEL_Y);
+    this.context.fillText(`Level: ${repo.level + 1}`, LEVEL_X, LEVEL_Y);
     this.context.restore();
 
     this.context.save();
     this.context.fillStyle = 'white';
     this.context.font = '18px sans';
     this.context.textAlign = 'right';
-    this.context.fillText(`Lives: ${game.livesCount}`, LIVES_X, LIVES_Y);
+    this.context.fillText(`Lives: ${repo.livesCount}`, LIVES_X, LIVES_Y);
     this.context.restore();
   }
 }

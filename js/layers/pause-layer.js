@@ -3,12 +3,12 @@ import {BaseLayer} from "./base-layer.js";
 export class PauseLayer extends BaseLayer {
   keyUpHandler = (event) => {
     if (event.key === 'Enter') {
-      this.dispatchEvent(new Event('resume'));
+      this.repo.hidePauseBackdrop();
     }
   }
 
   mouseClickHandler = () => {
-    this.dispatchEvent(new Event('resume'));
+    this.repo.hidePauseBackdrop();
   }
 
   onActivate() {

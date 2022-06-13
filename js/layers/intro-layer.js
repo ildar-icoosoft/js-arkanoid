@@ -3,12 +3,12 @@ import {BaseLayer} from "./base-layer.js";
 export class IntroLayer extends BaseLayer {
   keyUpHandler = (event) => {
     if (event.key === 'Enter') {
-      this.dispatchEvent(new Event('next'));
+      this.repo.showGameScreen();
     }
   }
 
   mouseClickHandler = () => {
-    this.dispatchEvent(new Event('next'));
+    this.repo.showGameScreen();
   }
 
   onActivate() {

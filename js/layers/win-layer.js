@@ -3,12 +3,12 @@ import {BaseLayer} from "./base-layer.js";
 export class WinLayer extends BaseLayer {
   keyUpHandler = (event) => {
     if (event.key === 'Enter') {
-      this.dispatchEvent(new Event('restart'));
+      this.repo.restartGame();
     }
   }
 
   mouseClickHandler = () => {
-    this.dispatchEvent(new Event('restart'));
+    this.repo.restartGame();
   }
 
   onActivate() {

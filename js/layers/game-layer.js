@@ -1,6 +1,6 @@
 import {BaseLayer} from "./base-layer.js";
-import {Paddle} from "../paddle.js";
-import {Ball} from "../ball.js";
+import {Paddle} from "../models/paddle.js";
+import {Ball} from "../models/ball.js";
 import {makeBricks} from "../bricks-factory.js";
 import {LEVELS} from "../levels.js";
 import {bounceFromPaddle, calculateCollision, calculateWallCollision, isColliding} from "../utils.js";
@@ -13,9 +13,12 @@ export class GameLayer extends BaseLayer {
     this.hasAnimation = true;
     this.paddle = new Paddle(this.space);
     this.ball = new Ball();
-    this.bricks = makeBricks(LEVELS[game.level]);
+    this.bricks = makeBricks(LEVELS[game.repo.level]);
 
     this.paddle.stickBall(this.ball);
+
+    this.repo.addEventListener('resurrect', () => this.resurrect());
+    this.repo.addEventListener('resetLevel', () => this.reset());
   }
 
   keyDownHandler = (event) => {
@@ -64,7 +67,7 @@ export class GameLayer extends BaseLayer {
   };
 
   blurHandler = () => {
-    this.dispatchEvent(new Event('pause'));
+    this.repo.showPauseBackdrop();
   };
 
   onActivate() {
@@ -101,11 +104,10 @@ export class GameLayer extends BaseLayer {
     this.updateGameStatus_();
   }
 
-  // сброс игры до первого уровня
   reset() {
     this.paddle.reset();
     this.ball.reset();
-    this.bricks = makeBricks(LEVELS[this.game.level]);
+    this.bricks = makeBricks(LEVELS[this.repo.level]);
     this.bricks.forEach((brick) => {
       brick.reset();
     });
@@ -124,10 +126,10 @@ export class GameLayer extends BaseLayer {
    */
   updateGameStatus_() {
     if (this.ball.y > this.space.height - this.ball.width) {
-      this.dispatchEvent(new Event('lose'));
+      this.repo.lose();
     } else {
       if (this.isLevelComplete_()) {
-        this.dispatchEvent(new Event('win'));
+        this.repo.win();
       }
     }
   }
@@ -213,7 +215,7 @@ export class GameLayer extends BaseLayer {
 
         brick.hit();
         if (!brick.intact) {
-          this.dispatchEvent(new Event('hitBrick'));
+          this.repo.hitBrick();
         }
 
         break;

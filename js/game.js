@@ -7,139 +7,59 @@ import {GameOverLayer} from "./layers/game-over-layer.js";
 import {WinLayer} from "./layers/win-layer.js";
 import {Layers} from "./layers.js";
 import {BackgroundLayer} from "./layers/background-layer.js";
-import {LEVELS} from "./levels.js";
-
-const LIVES_COUNT = 3;
+import {GameRepository} from "./game-repository.js";
 
 export class Game {
   constructor(containerId) {
-    this.livesCount = LIVES_COUNT;
-    this.level = 0;
-    this.score = 0;
     this.space = new Space(this, containerId);
-
-    const backgroundLayer = new BackgroundLayer(this);
-    const introLayer = new IntroLayer(this);
-    const gameLayer = new GameLayer(this);
-    const gameInfoLayer = new GameInfoLayer(this);
-    const pauseLayer = new PauseLayer(this);
-    const winLayer = new WinLayer(this);
-    const gameOverLayer = new GameOverLayer(this);
+    this.repo = new GameRepository();
 
     this.layers = new Layers({
-      background: backgroundLayer,
-      intro: introLayer,
-      game: gameLayer,
-      gameInfo: gameInfoLayer,
-      pause: pauseLayer,
-      win: winLayer,
-      gameOver: gameOverLayer,
+      background: new BackgroundLayer(this),
+      intro: new IntroLayer(this),
+      game: new GameLayer(this),
+      gameInfo: new GameInfoLayer(this),
+      pause: new PauseLayer(this),
+      win: new WinLayer(this),
+      gameOver: new GameOverLayer(this),
     });
 
-    introLayer.addEventListener('next', () => {
-      this.showGameScreen(false);
-    });
+    this.repo.addEventListener('updateLayersList', (event) => {
+      // @todo. Подумать над более изящным решением запуска gameLoop
+      // Если у текущих слоёв есть анимация, значит gameLoop вызывается после каждого кадра.
+      // Если нет, то gameLoop не вызывается и нужно его вызвать после помещения слоёв на холст putLayersOnCanvas()
+      const needToStartGameLoop = !this.layers.hasAnimation();
 
-    gameLayer.addEventListener('pause', () => {
-      this.showPauseScreen();
-    });
-
-    gameLayer.addEventListener('lose', () => {
-      this.livesCount--;
-      if (this.livesCount === 0) {
-        this.showGameOverScreen();
-      } else {
-        this.showGameScreen(true);
-        setTimeout(() => {
-          gameLayer.resurrect();
-          this.showGameScreen(false);
-        }, 1000);
+      this.layers.putLayersOnCanvas(event.detail);
+      if (needToStartGameLoop) {
+        this.gameLoop_();
       }
     });
 
-    gameLayer.addEventListener('hitBrick', () => {
-      this.score++;
-    })
-
-    pauseLayer.addEventListener('resume', () => {
-      this.showGameScreen(false);
+    this.repo.addEventListener('pauseLayer', (event) => {
+      this.layers.get(event.detail).pause();
     });
 
-    winLayer.addEventListener('restart', () => {
-      this.level = 0;
-      this.livesCount = LIVES_COUNT;
-      gameLayer.reset();
-      this.showGameScreen(false);
-    });
+    this.repo.addEventListener('resumeLayer', (event) => {
+      const needToStartGameLoop = !this.layers.hasAnimation();
 
-    gameOverLayer.addEventListener('restart', () => {
-      this.level = 0;
-      this.livesCount = LIVES_COUNT;
-      this.score = 0;
-      gameLayer.reset();
-      this.showGameScreen(false);
-    });
+      this.layers.get(event.detail).resume();
 
-    gameLayer.addEventListener('win', (event) => {
-      this.showGameScreen(true);
-
-      if (this.level < LEVELS.length - 1) {
-        this.level++;
-        setTimeout(() => {
-          gameLayer.reset();
-          this.showGameScreen(false);
-        }, 1000);
-      } else {
-        this.showWinScreen();
+      // @todo. Подумать над более изящным решением запуска gameLoop
+      if (needToStartGameLoop) {
+        this.gameLoop_();
       }
     });
   }
 
   start() {
-    this.showIntroScreen();
-  }
-
-  showIntroScreen() {
-    this.showLayers(['background', 'intro']);
+    this.repo.showIntroScreen();
   }
 
   /**
-   * @param {boolean} paused
+   * @private
    */
-  showGameScreen(paused) {
-    this.showLayers(['background', `game${paused ? '-' : ''}`, 'gameInfo']);
-  }
-
-  showPauseScreen() {
-    this.showLayers(['background', 'game-', 'gameInfo', 'pause']);
-  }
-
-  showGameOverScreen() {
-    this.showLayers(['background', 'game-', 'gameInfo', 'gameOver']);
-  }
-
-  showWinScreen() {
-    this.showLayers(['background', 'game-', 'gameInfo', 'win']);
-  }
-
-  /**
-   * Показывает слои
-   * @param {string[]} layers - Идентификаторы слоёв
-   */
-  showLayers(layers) {
-    // Если у текущих слоёв нет анимации, то метод gameLoop не вызывается после каждого кадра и нужно будет вызвать
-    // gameLoop после установки видимых слоёв через setVisibleLayers()
-    let needToStartGameLoop = false;
-    if (!this.layers.hasAnimation()) {
-      needToStartGameLoop = true;
-    }
-    this.layers.setVisibleLayers(layers);
-    if (needToStartGameLoop) {
-      this.gameLoop();
-    }
-  }
-
-  gameLoop() {
+  gameLoop_() {
     this.layers.update();
 
     this.space.clear();
@@ -147,7 +67,7 @@ export class Game {
     this.layers.draw();
 
     if (this.layers.hasAnimation()) {
-      window.requestAnimationFrame(() => this.gameLoop());
+      window.requestAnimationFrame(() => this.gameLoop_());
     }
   }
 }

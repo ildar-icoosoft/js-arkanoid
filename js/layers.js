@@ -21,99 +21,73 @@ export class Layers {
      * @type {string[]}
      * @private
      */
-    this.visibleLayerIds_ = [];
+    this.currentLayerIds_ = [];
   }
 
   /**
-   * Делает переданные слои видимыми, остальные слои отключает.
-   * @param {string[]} nextIds - Идентификаторы слоёв. Если нужно поставить слой на
-   * паузу, поставьте в конце идентификатора знак "-", например ["intro", "game-", "pause"].
-   * В этом случае слой с игрой будет поставлен на паузу, поверх него будет отображаться слой с надписью "Пауза"
+   * Помещает слои на холст. Затем, при вызове метода draw() эти слои будут отрисованы. Все остальные слои, которые ранее были добавлены на холст, удалятся.
+   * Все слои будут активны. Если какой-либо слой уже был на холсте и он был в состоянии паузы, то снимется с паузы.
+   * @param {string[]} newLayerIds - Идентификаторы слоёв. Слои будут расположены в том порядке, в котором находятся в массиве. Пример ["intro", "game", "pause"].
    */
-  setVisibleLayers(nextIds) {
-    /**
-     * Идентификаторы видимых слоёв. Эти слои будут показаны, остальные слои будут скрыты
-     * @type {string[]}
-     * */
-    const nextVisibleIds = [];
-
-    /**
-     * Идентификаторы видимых слоёв, которые поставлены на пуазу
-     * @type {string[]}
-     * */
-    const nextPausedIds = [];
-
-    for (let id of nextIds) {
-      if (id.endsWith('-')) {
-        id = id.slice(0, -1);
-        nextPausedIds.push(id);
-      }
-      nextVisibleIds.push(id);
-
+  putLayersOnCanvas(newLayerIds) {
+    for (let id of newLayerIds) {
       if (!this.allLayers_[id]) {
         throw Error(`unknown layer ${id}`);
       }
     }
 
     /**
-     * Вызываем хук деактивации у предыдущих слоёв в двух случаях:
-     * 1. Если скрываем слой
-     * 2. Если ставим слой на паузу
+     * Вызываем хук деактивации у текущих слоёв, которые будут удалены, при условии,
+     * что они сейчас не находятся в состоянии паузы. (т.к. при постановке на паузу у слоёв уже вызывался этот хук)
      */
-    this.visibleLayerIds_.forEach((id) => {
+    this.currentLayerIds_.forEach((id) => {
       const layer = this.allLayers_[id];
 
-      // Если слой находится на паузе, то он уже деактивирован и с ним ничего не делаем
-      if (layer.paused) {
-        return;
-      }
-
-      if (nextVisibleIds.includes(id)) {
-        if (nextPausedIds.includes(id)) {
-          // Вызываем хук деактивации у тех слоёв, которые ставим на паузу
+      if (!newLayerIds.includes(id)) {
+        if (!layer.paused) {
           layer.onDeactivate();
         }
-      } else {
-        // Вызываем хук деактивации у тех слоёв, которые раньше отображались, а теперь будут скрыты
-        layer.onDeactivate();
+        layer.paused = false;
       }
     });
 
     /**
-     * Вызываем хук активации у следующих слоёв в двух случаях:
-     * 1. Если раньше слой был скрыт
-     * 2. Если снимаем слой с паузы
+     * Вызываем хук активации у новых слоёв, которых ранее не было, либо были на паузе.
      */
-    nextVisibleIds.forEach((id) => {
+    newLayerIds.forEach((id) => {
       const layer = this.allLayers_[id];
 
-      const shouldBePaused = nextPausedIds.includes(id);
-
-      if (this.visibleLayerIds_.includes(id)) {
-        if (layer.paused && !shouldBePaused) {
-          // Если слой был и остаётся видимым, но раньше он был на паузе, а теперь не на
-          // паузе, то вызываем хук активации
+      if (this.currentLayerIds_.includes(id)) {
+        if (layer.paused) {
           layer.onActivate();
         }
       } else {
         // Вызываем хук активации у тех слоёв, которые раньше были скрыты, а теперь будут показаны
-        if (!shouldBePaused) {
-          layer.onActivate();
-        }
+        layer.onActivate();
       }
 
-      // ставим флаг paused для всех новых слоёв
-      layer.paused = nextPausedIds.includes(id);
+      // убираем флаг paused для всех новых слоёв
+      layer.paused = false;
     });
 
-    this.visibleLayerIds_ = nextVisibleIds;
+    // клонируем массив на всякий случай, если вдруг кто-то потом изменит входящий параметр по ссылке
+    this.currentLayerIds_ = [...newLayerIds];
+  }
+
+  /**
+   *
+   * @param {string} id - Идентификатор слоя
+   * @returns {BaseLayer}
+   */
+  get(id) {
+    return this.allLayers_[id];
   }
 
   /**
    * Подготовка данных в слоях к следующему кадру. У всех видимых слоёв вызывается метод update(), кроме тех, которые поставлены на паузу
    */
   update() {
-    this.visibleLayerIds_.forEach(id => {
+    this.currentLayerIds_.forEach(id => {
       if (!this.allLayers_[id].paused) {
         this.allLayers_[id].update();
       }
@@ -124,7 +98,7 @@ export class Layers {
    * Отрисовка всех видимых слоёв. У всех видимых слоёв вызывается метод draw()
    */
   draw() {
-    this.visibleLayerIds_.forEach(id => this.allLayers_[id].draw());
+    this.currentLayerIds_.forEach(id => this.allLayers_[id].draw());
   }
 
   /**
@@ -132,6 +106,6 @@ export class Layers {
    * ему нужен вызов методов update() и draw() для каждого кадра
    */
   hasAnimation() {
-    return this.visibleLayerIds_.some(id => this.allLayers_[id].hasAnimation && !this.allLayers_[id].paused);
+    return this.currentLayerIds_.some(id => this.allLayers_[id].hasAnimation && !this.allLayers_[id].paused);
   }
 }
