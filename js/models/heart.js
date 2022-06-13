@@ -1,6 +1,3 @@
-const image = new Image();
-image.src = 'img/heart.svg';
-
 export class Heart {
   constructor() {
     this.x = 0;
@@ -8,11 +5,14 @@ export class Heart {
 
     this.width = 20;
     this.height = 20;
+
+    this.image = new Image();
+    this.image.src = 'img/heart.svg';
   }
 
   draw(context) {
     context.drawImage(
-      image,
+      this.image,
       this.x,
       this.y,
       this.width,

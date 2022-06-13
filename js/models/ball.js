@@ -20,7 +20,14 @@ export class Ball {
 
     const radius = this.width / 2;
 
-    context.fillStyle = 'white';
+    // context.createLinearGradient(this.x, this.y, this.x + this.width, this.y + this.width);
+
+    const gradient = context.createRadialGradient(this.x + radius / 2,this.y + radius / 2, radius,this.x + radius / 2,this.y + radius / 2,radius / 3);
+    gradient.addColorStop(0, "#092d56");
+    gradient.addColorStop(1, "#506ce3");
+    context.fillStyle = gradient;
+
+    // context.fillStyle = 'white';
     context.beginPath();
     context.arc(this.x + radius, this.y + radius, radius, 0, 2 * Math.PI);
     context.fill();
