@@ -9,7 +9,7 @@ const LEVEL_X = SPACE_WIDTH - 20;
 const LEVEL_Y = SPACE_HEIGHT - 20;
 
 const HEARTS_GAP = 10;
-const LIVES_Y = 30;
+const LIVES_Y = 10;
 
 export class GameInfoLayer extends BaseLayer {
   draw() {
@@ -32,7 +32,6 @@ export class GameInfoLayer extends BaseLayer {
     for (let i = 1; i < repo.livesCount; i++) {
       const heart = new Heart();
       heart.x = this.space.width - (heart.width + HEARTS_GAP) * i - HEARTS_GAP / 2;
-      // heart.x = LIVES_X;
       heart.y = LIVES_Y;
       heart.draw(this.context);
     }
