@@ -1,9 +1,9 @@
 'use strict';
 
-const PADDLE_WIDTH = 150;
-const PADDLE_HEIGHT = 25;
+const PADDLE_WIDTH = 120;
+const PADDLE_HEIGHT = 20;
 const PADDLE_SPEED = 25;
-const PADDLE_BOTTOM = 100;
+const PADDLE_BOTTOM = 40;
 
 export class Paddle {
   constructor(space) {
@@ -64,7 +64,13 @@ export class Paddle {
 
   draw(context) {
     context.save();
-    context.fillStyle = 'rgb(200, 121, 255)';
+
+    const gradient = context.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
+    gradient.addColorStop(0, "#092d56");
+    gradient.addColorStop(.5, "#506ce3");
+    gradient.addColorStop(1, "#092d56");
+    context.fillStyle = gradient;
+
     context.fillRect(this.x, this.y, this.width, this.height);
     context.restore();
   }

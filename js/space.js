@@ -1,6 +1,6 @@
 'use strict';
 
-export const SPACE_WIDTH = 1000;
+export const SPACE_WIDTH = 600;
 export const SPACE_HEIGHT = 600;
 
 export class Space {

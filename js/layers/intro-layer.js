@@ -25,15 +25,43 @@ export class IntroLayer extends BaseLayer {
     const x = Math.floor(this.space.width / 2);
     const y = Math.floor(this.space.height / 2);
 
-    this.context.save();
-    this.context.fillStyle = 'white';
-    this.context.font = '32px sans';
-    this.context.textAlign = 'center';
-    this.context.fillText(message, x, y);
-    this.context.restore();
+    document.fonts.load('62px bold Fredoka One').then(() => {
+      this.context.save();
+
+      this.context.font = '62px bold Fredoka One';
+      this.context.textAlign = 'center';
+
+      this.context.lineWidth = 11;
+      this.context.strokeStyle = '#000';
+      this.context.strokeText(message, x, y);
+
+      this.context.lineWidth = 8;
+      this.context.strokeStyle = '#D0D';
+      this.context.strokeText(message, x, y);
+
+      this.context.lineWidth = 5;
+      this.context.strokeStyle = '#ccc';
+      this.context.strokeText(message, x, y);
+
+      this.context.fillStyle = '#DD00DD';
+      this.context.fillText(message, x, y);
+
+      this.context.restore();
+    });
+
+    document.fonts.load('20px Orbitron').then(() => {
+      this.context.save();
+
+      this.context.font = '20px Orbitron';
+      this.context.textAlign = 'center';
+      this.context.fillStyle = 'white';
+      this.context.fillText('click to start', x, y + 50);
+
+      this.context.restore();
+    });
   }
 
   draw() {
-    this.drawMessage('Welcome to Arkanoid. Click to start');
+    this.drawMessage('Arkanoid');
   }
 }
