@@ -3,11 +3,22 @@ import {BaseLayer} from "./base-layer.js";
 export class IntroLayer extends BaseLayer {
   keyUpHandler = (event) => {
     if (event.code === 'Enter' || event.code === 'Space') {
-      this.repo.showGameScreen();
+      this.nextScreen();
     }
   }
 
   mouseClickHandler = () => {
+    this.nextScreen();
+  }
+
+  constructor(game) {
+    super(game);
+    this.nextStepAudio = document.createElement("audio");
+    this.nextStepAudio.src = "sounds/melody1.mp3";
+  }
+
+  nextScreen() {
+    this.nextStepAudio.play();
     this.repo.showGameScreen();
   }
 

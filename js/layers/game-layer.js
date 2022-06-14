@@ -19,6 +19,18 @@ export class GameLayer extends BaseLayer {
 
     this.repo.addEventListener('resurrect', () => this.resurrect());
     this.repo.addEventListener('resetLevel', () => this.reset());
+
+    this.hitBrickAudio = document.createElement("audio");
+    this.hitBrickAudio.src = "sounds/pop2.mp3";
+
+    this.loseAudio = document.createElement("audio");
+    this.loseAudio.src = "sounds/melody2.mp3";
+
+    this.hitWallAudio = document.createElement("audio");
+    this.hitWallAudio.src = "sounds/pop.mp3";
+
+    this.hitPaddleAudio = document.createElement("audio");
+    this.hitPaddleAudio.src = "sounds/thum.mp3";
   }
 
   keyDownHandler = (event) => {
@@ -126,6 +138,7 @@ export class GameLayer extends BaseLayer {
    */
   updateGameStatus_() {
     if (this.ball.y > this.space.height - this.ball.width) {
+      this.loseAudio.play();
       this.repo.lose();
     } else {
       if (this.isLevelComplete_()) {
@@ -165,6 +178,9 @@ export class GameLayer extends BaseLayer {
     if (wallCollision.includes('horizontal')) {
       ball.yStep *= -1;
     }
+    if (wallCollision.length) {
+      this.hitWallAudio.play();
+    }
   }
 
   /**
@@ -183,6 +199,7 @@ export class GameLayer extends BaseLayer {
       ry: newY + ball.width
     }, this.paddle.box())) {
       const paddleCollision = calculateCollision(this.ball, this.paddle.box());
+      this.hitPaddleAudio.play();
       if (paddleCollision.plane === 'vertical') {
         ball.xStep *= -1;
       } else if (paddleCollision.plane === 'horizontal') {
@@ -214,6 +231,8 @@ export class GameLayer extends BaseLayer {
         }
 
         brick.hit();
+        this.hitBrickAudio.play();
+
         if (!brick.intact) {
           this.repo.hitBrick();
         }
