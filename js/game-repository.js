@@ -17,6 +17,12 @@ export class GameRepository extends EventTarget {
     this.livesCount = LIVES_COUNT;
 
     this.level = 0;
+
+    this.winLevelAudio = document.createElement("audio");
+    this.winLevelAudio.src = "sounds/melody3.mp3";
+
+    this.winGameAudio = document.createElement("audio");
+    this.winGameAudio.src = "sounds/victory.mp3";
   }
 
   showIntroScreen() {
@@ -89,6 +95,7 @@ export class GameRepository extends EventTarget {
 
   win() {
     if (this.level < LEVELS.length - 1) {
+      this.winLevelAudio.play();
       this.level++;
       this.pauseLayer_('game');
       setTimeout(() => {
@@ -96,6 +103,7 @@ export class GameRepository extends EventTarget {
         this.resumeLayer_('game');
       }, 1000);
     } else {
+      this.winGameAudio.play();
       this.layers = [
         ...this.layers,
         'win'
