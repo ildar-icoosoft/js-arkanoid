@@ -10,7 +10,6 @@ export class GameLayer extends BaseLayer {
   constructor(game) {
     super(game);
 
-    this.hasAnimation = true;
     this.paddle = new Paddle(this.space);
     this.ball = new Ball();
     this.bricks = makeBricks(LEVELS[game.repo.level]);

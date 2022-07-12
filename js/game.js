@@ -28,15 +28,7 @@ export class Game {
     });
 
     this.repo.addEventListener('updateLayersList', (event) => {
-      // @todo. Подумать над более изящным решением запуска gameLoop
-      // Если у текущих слоёв есть анимация, значит gameLoop вызывается после каждого кадра.
-      // Если нет, то gameLoop не вызывается и нужно его вызвать после помещения слоёв на холст putLayersOnCanvas()
-      const needToStartGameLoop = !this.layers.hasAnimation();
-
       this.layers.putLayersOnCanvas(event.detail);
-      if (needToStartGameLoop) {
-        this.gameLoop_();
-      }
     });
 
     this.repo.addEventListener('pauseLayer', (event) => {
@@ -44,19 +36,13 @@ export class Game {
     });
 
     this.repo.addEventListener('resumeLayer', (event) => {
-      const needToStartGameLoop = !this.layers.hasAnimation();
-
       this.layers.get(event.detail).resume();
-
-      // @todo. Подумать над более изящным решением запуска gameLoop
-      if (needToStartGameLoop) {
-        this.gameLoop_();
-      }
     });
   }
 
   start() {
     this.repo.showIntroScreen();
+    this.gameLoop_();
   }
 
   /**
@@ -69,8 +55,6 @@ export class Game {
 
     this.layers.draw();
 
-    if (this.layers.hasAnimation()) {
-      window.requestAnimationFrame(() => this.gameLoop_());
-    }
+    window.requestAnimationFrame(() => this.gameLoop_());
   }
 }

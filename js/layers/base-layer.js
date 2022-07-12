@@ -7,7 +7,6 @@ export class BaseLayer {
       throw new Error("Abstract classes can't be instantiated.");
     }
 
-    this.hasAnimation = false;
     this.game = game;
     this.space = game.space;
     this.context = game.space.context;
