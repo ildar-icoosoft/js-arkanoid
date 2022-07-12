@@ -100,12 +100,4 @@ export class Layers {
   draw() {
     this.currentLayerIds_.forEach(id => this.allLayers_[id].draw());
   }
-
-  /**
-   * Возвращает true, если у какого-нибудь видимого слоя есть анимация и
-   * ему нужен вызов методов update() и draw() для каждого кадра
-   */
-  hasAnimation() {
-    return this.currentLayerIds_.some(id => this.allLayers_[id].hasAnimation && !this.allLayers_[id].paused);
-  }
 }
